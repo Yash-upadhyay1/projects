@@ -18,11 +18,13 @@ name:{
     password: {
         type: String,
         required: true
-    },
-
+    }
+},
+{
     timestamps:true    // Automatically adds createdAt and updatedAt
-    
-});
+}
+
+);
 
 // Create a model from schema
 // "User" → collection name will become "users" in MongoDB

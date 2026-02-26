@@ -1,3 +1,5 @@
+
+
 // Import express library to create server
 const express = require("express");
 
@@ -6,6 +8,9 @@ const dotenv = require("dotenv");
 
 // Import database connection function
 const connectDB = require("./config/db");
+
+// Import auth routes
+const authRoutes = require("./routes/authRoutes");
 
 // Load environment variables from .env file into process.env
 dotenv.config();
@@ -19,11 +24,15 @@ const app = express();
 // Middleware to parse incoming JSON data from requests
 app.use(express.json());
 
+// Use auth routes
+app.use("/api/auth", authRoutes);
+
 // Create a simple GET route for home
 app.get("/", (req, res) => {
     // Send response back to client
     res.send("Server is running 🚀");
 });
+
 
 // Define port number from environment variable
 // If PORT is not defined in .env, fallback to 5000
