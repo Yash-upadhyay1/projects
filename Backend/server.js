@@ -1,44 +1,63 @@
-
-
-// Import express library to create server
+// Import express
 const express = require("express");
 
-// Import dotenv to use environment variables
-const dotenv = require("dotenv");
-
-// Import database connection function
-const connectDB = require("./config/db");
-
-// Import auth routes
-const authRoutes = require("./routes/authRoutes");
-
-// Load environment variables from .env file into process.env
-dotenv.config();
-
-// Connect to MongoDB
-connectDB();
-
-// Create an express application instance
+// Create express app FIRST
 const app = express();
 
-// Middleware to parse incoming JSON data from requests
+// Import dotenv
+const dotenv = require("dotenv");
+
+// Import database connection
+const connectDB = require("./config/db");
+
+// Import cookie parser
+const cookieParser = require("cookie-parser");
+
+// Import cors
+const cors = require("cors");
+
+// Import routes
+const authRoutes = require("./routes/authRoutes");
+const internshipRoutes = require("./routes/internshipRoutes");
+
+// Import middleware
+const isAuthenticated = require("./middleware/authMiddleware");
+
+// Load environment variables
+dotenv.config();
+
+// Connect to DB
+connectDB();
+
+// MIDDLEWARES (after app is created)
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+
 app.use(express.json());
+app.use(cookieParser());
 
-// Use auth routes
+// Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/internships", internshipRoutes);
 
-// Create a simple GET route for home
-app.get("/", (req, res) => {
-    // Send response back to client
-    res.send("Server is running 🚀");
+app.get("/api/protected", isAuthenticated, (req, res) => {
+  res.json({
+    message: "You accessed protected route",
+    user: req.user,
+  });
 });
 
+app.get("/", (req, res) => {
+  res.send("Server is running 🚀");
+});
 
-// Define port number from environment variable
-// If PORT is not defined in .env, fallback to 5000
+// Port
 const PORT = process.env.PORT || 5000;
 
-// Start the server and listen on the defined port
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
